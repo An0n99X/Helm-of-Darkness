@@ -299,8 +299,8 @@ body { font-size: 17px; line-height: 1.6; }
 .article-end p { color: #c0c2ba; font-size: .82rem; }
 
 /* Small, functional motion. Article prose stays still and immediately readable. */
-.hero-image { transform: scale(1.035); animation: hero-image-settle 1.8s cubic-bezier(.2,.7,.25,1) both; }
-.hero-copy, .archive-banner-copy { animation: hero-copy-arrive .65s .08s cubic-bezier(.2,.7,.25,1) both; }
+.hero-image { transform: scale(1.035); animation: hero-image-settle 2.8s cubic-bezier(.2,.7,.25,1) both; }
+.hero-copy, .archive-banner-copy { animation: hero-copy-arrive 1.05s .12s cubic-bezier(.2,.7,.25,1) both; }
 .brand-mark { transition: transform .3s ease; }
 .brand:hover .brand-mark, .brand:focus-visible .brand-mark { transform: rotate(-7deg) scale(1.06); }
 .feature-card { transition: border-color .24s ease, transform .24s ease, background-color .24s ease; }
