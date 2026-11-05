@@ -52,6 +52,9 @@ const base = import.meta.env.BASE_URL;
       link.classList.toggle("is-active", active);
       if (active) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
+      if (active && window.matchMedia("(max-width: 640px)").matches) {
+        link.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
     }
   }
 
