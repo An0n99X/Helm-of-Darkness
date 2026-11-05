@@ -7,7 +7,7 @@ const posts = (await getCollection("posts", ({ data }) => data.published <= new 
 const base = import.meta.env.BASE_URL;
 ---
 
-<SiteLayout title="Research archive" description="Long-form investigations from first clue to fix, with the code, evidence, and real-world impact in view.">
+<SiteLayout title="Research archive" description="Security research and vulnerability writeups by Anubhav Dash, with technical analysis, proof-of-concept evidence, and fixes.">
   <main id="main" class="archive-page mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
     <div class="archive-banner">
       <img src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" />
@@ -15,7 +15,7 @@ const base = import.meta.env.BASE_URL;
       <div class="archive-banner-copy">
         <p class="eyebrow">THE HELM / RESEARCH INDEX</p>
         <h1>Reports from<br /><span>under the surface.</span></h1>
-        <p>Long-form investigations from first clue to fix, with the code, evidence, and real-world impact in view.</p>
+        <p>Technical writeups on software vulnerabilities: how they work, what they affect, and how they were fixed or disclosed.</p>
       </div>
     </div>
     <div class="archive-list">
