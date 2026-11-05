@@ -13,7 +13,7 @@ featured: true
 findings:
   - name: MBufferSetRandom
     severity: High
-    score: CVSS 7.5
+    score: CVSS 7.7
     advisory: GHSA-cg9c-gcgh-qgc3
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-cg9c-gcgh-qgc3
   - name: readKDATransfers
@@ -142,6 +142,8 @@ The affected entry point, `ManagedMultiTransferKDANFTExecute`, is categorized as
 The advisory credits three finders, including me, and says maintainers found the path on September 20 while reviewing the sibling managed-vector decoder. The accepted credit is real; the article does not turn that into a solo-discovery story. See [GHSA-3xw3-gjh2-5j94](https://github.com/klever-io/klever-go/security/advisories/GHSA-3xw3-gjh2-5j94), rated High.
 
 The `FixAuditChangesV6` repair caps the vector, calculates the cost of the token identifiers using their stored lengths, and applies a bounded charge before cloning them. It rejects a vector that cannot afford its transfers before constructing the decoded records. This closes the amplification at the point where the host would otherwise begin copying.
+
+The transfer decoder has a sibling with the same ordering mistake but a different input format. `ReadManagedVecOfManagedBuffers` reads four-byte managed-buffer handles and clones each referenced byte slice before charging for it. Repeating one handle is enough: the advisory's real-WASM reproduction used 1,024 references to a 64 KiB buffer and measured about 64 MiB of clone traffic. The managed write-log hook then charged for topic and data bytes again, so the observed gas total includes both the decoder's unbounded record and the hook-level charge. This separate report is [GHSA-qqr9-92pp-89p7](https://github.com/klever-io/klever-go/security/advisories/GHSA-qqr9-92pp-89p7); GitHub credits me as a Reporter. It belongs in the same resource-accounting family, though the four findings above are the ones examined in depth here.
 
 ## PushState copied 199,000 handles for zero gas
 

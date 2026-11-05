@@ -1,13 +1,14 @@
 ---
 import { getCollection } from "astro:content";
 import SiteLayout from "../../layouts/SiteLayout.astro";
+import { advisoryGroups, publishedAdvisoryCount } from "../../data/advisories";
 
 const posts = (await getCollection("posts", ({ data }) => data.published <= new Date()))
   .sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
 const base = import.meta.env.BASE_URL;
 ---
 
-<SiteLayout title="Research archive" description="Security research and vulnerability writeups by Anubhav Dash, with technical analysis, proof-of-concept evidence, and fixes.">
+<SiteLayout title="Research archive" description="Long-form security research by Anubhav Dash, plus a grouped index of published Klever Go advisories crediting his work.">
   <main id="main" class="archive-page mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
     <div class="archive-banner">
       <img src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" />
@@ -18,16 +19,47 @@ const base = import.meta.env.BASE_URL;
         <p>Technical writeups on software vulnerabilities: how they work, what they affect, and how they were fixed or disclosed.</p>
       </div>
     </div>
-    <div class="archive-list">
-      {posts.map((post) => <article class="archive-row">
-        <div class="archive-copy">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-2"><time datetime={post.data.published.toISOString()}>{post.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span class="archive-dot">·</span>{post.data.tags.map((tag) => <span class="archive-tag">{tag}</span>)}</div>
-          <h2><a href={`${base}research/${post.data.slug}/`}>{post.data.title}<span aria-hidden="true"> ↗</span></a></h2>
-          <p>{post.data.description}</p>
-          {post.data.findings.length > 0 && <div class="finding-pills">{post.data.findings.map((finding) => <span>{finding.name}</span>)}</div>}
-        </div>
-      </article>)}
-      {posts.length === 0 && <p class="empty-state">No reports yet. Check back soon.</p>}
-    </div>
+    <section class="archive-reports" aria-labelledby="archive-reports-heading">
+      <div class="archive-section-heading">
+        <p class="eyebrow">FIELD REPORTS</p>
+        <h2 id="archive-reports-heading">Research, in depth</h2>
+      </div>
+      <div class="archive-list">
+        {posts.map((post) => <article class="archive-row">
+          <div class="archive-copy">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2"><time datetime={post.data.published.toISOString()}>{post.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span class="archive-dot">·</span>{post.data.tags.map((tag) => <span class="archive-tag">{tag}</span>)}</div>
+            <h2><a href={`${base}research/${post.data.slug}/`}>{post.data.title}<span aria-hidden="true"> ↗</span></a></h2>
+            <p>{post.data.description}</p>
+            {post.data.findings.length > 0 && <div class="finding-pills">{post.data.findings.map((finding) => <span>{finding.name}</span>)}</div>}
+          </div>
+        </article>)}
+        {posts.length === 0 && <p class="empty-state">No reports yet. Check back soon.</p>}
+      </div>
+    </section>
+
+    <section class="advisory-index" aria-labelledby="advisory-index-heading">
+      <header class="advisory-index-intro">
+        <p class="eyebrow">PUBLIC GHSA RECORDS</p>
+        <h2 id="advisory-index-heading">The advisory index</h2>
+        <p>{publishedAdvisoryCount} published Klever Go advisories credit me as a Finder or Reporter. The role and severity below match each GitHub record; the advisory remains the source of truth for its affected and patched versions.</p>
+      </header>
+      <div class="advisory-groups">
+        {advisoryGroups.map((group) => <section class="advisory-group" aria-label={group.title}>
+          <header class="advisory-group-heading">
+            <div><h3>{group.title}</h3><p>{group.description}</p></div>
+            <a href={`${base}research/${group.articleSlug}/`}>Read the report <span aria-hidden="true">↗</span></a>
+          </header>
+          <ul class="advisory-records">
+            {group.advisories.map((entry) => <li>
+              <a class="advisory-record" href={`https://github.com/klever-io/klever-go/security/advisories/${entry.id}`} target="_blank" rel="noreferrer">
+                <span class="advisory-record-main"><strong>{entry.name}</strong><span>{entry.context}</span></span>
+                <span class={`severity-badge ${entry.severity.toLowerCase()}`}>{entry.severity}</span>
+                <span class="advisory-record-meta"><span>CVSS {entry.cvss}</span><span>{entry.credit}</span><code>{entry.id}</code></span>
+              </a>
+            </li>)}
+          </ul>
+        </section>)}
+      </div>
+    </section>
   </main>
 </SiteLayout>
