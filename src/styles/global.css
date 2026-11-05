@@ -30,7 +30,7 @@ a { color: inherit; text-decoration: none; }
 .skip-link:focus { top: 1rem; }
 .site-header { position: relative; z-index: 4; border-bottom: 1px solid var(--line); background: #090b0d; }
 .brand { display: inline-flex; align-items: center; gap: .65rem; font: 600 .8rem "DM Mono", monospace; letter-spacing: .08em; }
-.brand-mark { color: var(--signal); font-size: 1.25rem; }
+.brand-mark { display: block; width: 27px; height: 27px; flex: 0 0 27px; }
 .brand-muted { color: #979a92; }
 .nav-link { color: #b6b7b1; font-size: .83rem; transition: color .2s ease; }
 .nav-link:hover, .nav-link:focus-visible { color: var(--signal); }
@@ -85,9 +85,14 @@ a { color: inherit; text-decoration: none; }
 .empty-state { border: 1px solid var(--line); padding: 2rem; color: #aeb0a9; }
 
 .archive-page { min-height: 75vh; }
-.archive-intro { max-width: 750px; padding: 2rem 0 5rem; }
-.archive-intro h1, .not-found h1 { font-size: clamp(3rem, 7vw, 6.5rem); }
-.archive-intro > p:last-child { max-width: 560px; color: #aaada5; font-size: 1.05rem; line-height: 1.7; }
+.archive-banner { position: relative; min-height: 390px; margin: 0 0 4rem; overflow: hidden; border: 1px solid var(--line); background: #101315; }
+.archive-banner > img, .archive-banner-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.archive-banner > img { object-fit: cover; object-position: center 54%; opacity: .76; }
+.archive-banner-shade { background: linear-gradient(90deg, rgba(7, 10, 12, .92), rgba(7, 10, 12, .55) 58%, rgba(7, 10, 12, .18)), linear-gradient(0deg, rgba(7, 10, 12, .55), transparent 60%); }
+.archive-banner-copy { position: relative; z-index: 1; max-width: 780px; padding: clamp(2rem, 5vw, 4.5rem); }
+.archive-banner h1, .not-found h1 { margin: 1.1rem 0 1rem; color: #f4f2e9; font: 600 clamp(3rem, 7vw, 6.5rem)/.98 "Space Grotesk", sans-serif; letter-spacing: -.065em; }
+.archive-banner h1 span, .not-found h1 span { color: var(--signal); }
+.archive-banner-copy > p:last-child { max-width: 560px; color: #d0d0c9; font-size: 1.05rem; line-height: 1.7; }
 .archive-list { border-top: 1px solid var(--line); }
 .archive-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 1.5rem; border-bottom: 1px solid var(--line); padding: 2.3rem 0; }
 .archive-number { color: #555a52; font: 1rem "DM Mono", monospace; }
@@ -182,7 +187,10 @@ a { color: inherit; text-decoration: none; }
   .feature-meta { font-size: .58rem; }
   .recent-grid { grid-template-columns: 1fr; }
   .recent-card { min-height: auto; }
-  .archive-intro { padding: 1rem 0 3rem; }
+  .archive-banner { min-height: 420px; margin-bottom: 3rem; }
+  .archive-banner > img { object-position: 62% center; }
+  .archive-banner-shade { background: linear-gradient(90deg, rgba(7, 10, 12, .88), rgba(7, 10, 12, .34)), linear-gradient(0deg, rgba(7, 10, 12, .7), transparent 65%); }
+  .archive-banner-copy { padding: 2rem 1.5rem; }
   .archive-row { grid-template-columns: 35px minmax(0, 1fr); gap: .65rem; padding: 1.7rem 0; }
   .archive-number { font-size: .8rem; }
   .finding-grid { grid-template-columns: 1fr; }
