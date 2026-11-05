@@ -1,6 +1,6 @@
 ---
-title: The Work That Outlives the Request
-description: "Three node-availability findings followed different lifetimes: a goroutine outlived its peer message, nested output outgrew its contract call, and a startup-time API request reached state that was not ready."
+title: "The Silent Siege: A Thousand Open Doors, Nobody Knocking"
+description: "A silent P2P stream, a multiplying VM output list, and a startup-time API request exposed three ways node work could outlast its intended bounds."
 slug: the-work-that-outlives-the-request
 published: 2026-11-05
 updated: 2026-11-05
@@ -16,6 +16,11 @@ findings:
     score: CVSS 7.5
     advisory: GHSA-v8j2-98j2-rqv2
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-v8j2-98j2-rqv2
+  - name: ReadManagedVecOfManagedBuffers
+    severity: High
+    score: CVSS 7.5
+    advisory: GHSA-qqr9-92pp-89p7
+    url: https://github.com/klever-io/klever-go/security/advisories/GHSA-qqr9-92pp-89p7
   - name: Nested DeletedAccounts growth
     severity: High
     score: CVSS 7.5
@@ -32,7 +37,7 @@ An availability failure does not always begin with a large packet or an expensiv
 
 These three Klever Go reports affect different subsystems and have different triggers. One pins a goroutine in the P2P layer. One makes VM output grow exponentially. One lets a nil block header panic in a helper goroutine and terminate the process. They belong together because each failure is about the lifetime of host work: what keeps it alive, how often it is copied, and whether the state it touches is initialized.
 
-## An empty stream still occupies a goroutine
+## Waiting for Godot (ReadMsg)
 
 The direct-send P2P handler registered a callback for incoming streams. For each stream, it started a goroutine that repeatedly called `ReadMsg`. If a connected peer opened a stream and sent no data, the goroutine blocked waiting for the first message. There was no read deadline to make that wait expire.
 
@@ -46,7 +51,13 @@ The remedy is to give the stream an explicit lifetime: set a read deadline, clea
 
 The advisory is [GHSA-v8j2-98j2-rqv2](https://github.com/klever-io/klever-go/security/advisories/GHSA-v8j2-98j2-rqv2), rated High and patched in `1.7.21-rc2`. GitHub credits me as a Reporter.
 
-## A child call copied its parent's deletion list
+## Mirror, Mirror, 256 MiB
+
+`ReadManagedVecOfManagedBuffers` decodes a vector of handles. The vector can repeat the same handle, and `GetBytes` returns a fresh copy each time. The decoder cloned each referenced buffer before its unbounded gas accounting could limit anything. A short vector of repeated references could therefore make host allocation scale with the number of entries multiplied by the size of the referenced buffer.
+
+In the reported reproduction, 1,024 references to a 64 KiB buffer imply 64 MiB of clone traffic; 4,096 references imply 256 MiB. The key detail is aliasing: the contract stores one buffer and repeats its handle, while the host materializes each copy. The report is [GHSA-qqr9-92pp-89p7](https://github.com/klever-io/klever-go/security/advisories/GHSA-qqr9-92pp-89p7), rated High and patched in `1.7.22`.
+
+## Doubling the Dead
 
 The VM output finding takes a different route. A smart contract performs nested calls, and the VM host preserves and restores output state around those calls. The child output is supposed to contain the effects produced by that child.
 
@@ -60,7 +71,7 @@ This is not the same as a contract legitimately deleting a million distinct acco
 
 The report, [GHSA-hw69-3fg8-wrmm](https://github.com/klever-io/klever-go/security/advisories/GHSA-hw69-3fg8-wrmm), is rated High and lists `1.7.22` as patched. GitHub credits me as a Reporter.
 
-## A route reached the node before its header existed
+## Nil Is Not a Block
 
 The allowance-list crash was a startup-state problem. `GetAvailableClaim` called `GetCurrentBlockHeader()` and immediately used the returned value to read the epoch and timestamp. The blockchain implementation returns `nil` when no current header has been set.
 
