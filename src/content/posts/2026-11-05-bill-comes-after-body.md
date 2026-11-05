@@ -21,16 +21,16 @@ findings:
     score: CVSS 7.5
     advisory: GHSA-3xw3-gjh2-5j94
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-3xw3-gjh2-5j94
-  - name: PushState
-    severity: Moderate
-    score: CVSS 5.3
-    advisory: GHSA-gjm9-w2m6-rmp9
-    url: https://github.com/klever-io/klever-go/security/advisories/GHSA-gjm9-w2m6-rmp9
   - name: BigIntShl
     severity: High
     score: CVSS 8.6
     advisory: GHSA-r2gq-244g-h8p2
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-r2gq-244g-h8p2
+  - name: PushState
+    severity: Moderate
+    score: CVSS 5.3
+    advisory: GHSA-gjm9-w2m6-rmp9
+    url: https://github.com/klever-io/klever-go/security/advisories/GHSA-gjm9-w2m6-rmp9
 ---
 
 The largest non-negative shift accepted by `BigIntShl` turns the integer `1` into a 256 MiB result. I ran that call against the production VM host with one million gas available. The shift completed; only afterward did the hook record the result-size gas.
