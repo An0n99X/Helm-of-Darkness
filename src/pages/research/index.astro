@@ -8,10 +8,10 @@ const posts = (await getCollection("posts", ({ data }) => data.published <= new 
 const base = import.meta.env.BASE_URL;
 ---
 
-<SiteLayout title="Research archive" description="Long-form security research by Anubhav Dash, plus a grouped index of published Klever Go advisories crediting his work.">
+<SiteLayout title="Research archive" description="Long-form security research by Anubhav Dash, plus a grouped index of published Klever Go advisories crediting his work." preloadImage={`${base}images/milky-way.webp`}>
   <main id="main" class="archive-page mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
     <div class="archive-banner">
-      <img src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" />
+      <img src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" width="800" height="551" fetchpriority="high" decoding="async" />
       <div class="archive-banner-shade"></div>
       <div class="archive-banner-copy">
         <p class="eyebrow">THE HELM / RESEARCH INDEX</p>

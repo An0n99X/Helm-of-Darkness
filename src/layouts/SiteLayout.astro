@@ -5,12 +5,14 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  preloadImage?: string;
 }
 
 const {
   title = "Helm of Darkness",
   description = "Independent security research by Anubhav Dash on blockchain nodes and VM hosts, with vulnerability analysis, reproduction evidence, disclosure, and fixes.",
   image,
+  preloadImage,
 } = Astro.props;
 const pageTitle = title === "Helm of Darkness" ? title : `${title} · Helm of Darkness`;
 const socialImage = image ? new URL(image, Astro.site) : undefined;
@@ -26,6 +28,7 @@ const base = import.meta.env.BASE_URL;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#090b0d" />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon-mythosaur.svg`} />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />

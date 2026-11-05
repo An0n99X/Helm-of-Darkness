@@ -10,11 +10,11 @@ const base = import.meta.env.BASE_URL;
 const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base}research/`;
 ---
 
-<SiteLayout image={`${base}images/milky-way.webp`}>
+<SiteLayout image={`${base}images/milky-way.webp`} preloadImage={`${base}images/milky-way.webp`}>
   <main id="main">
     <section class="home-hero mx-auto max-w-7xl px-6 pt-4 lg:px-10">
       <div class="hero-frame">
-        <img class="hero-image" src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" fetchpriority="high" />
+        <img class="hero-image" src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" width="800" height="551" fetchpriority="high" decoding="async" />
         <div class="hero-shade"></div>
         <div class="hero-copy">
           <h1>Under this wide sky,<br /><span>there's always more</span></h1>
@@ -45,7 +45,7 @@ const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base
             <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time></div>
           </div>
           <div class="feature-aside">
-            <img class="constellation-image" src={`${base}images/cassiopeia-constellation.webp`} alt="The Cassiopeia constellation outlined against a star field" />
+            <img class="constellation-image" src={`${base}images/cassiopeia-constellation.webp`} alt="The Cassiopeia constellation outlined against a star field" width="1000" height="667" loading="lazy" decoding="async" />
           </div>
         </a>
       ) : (
