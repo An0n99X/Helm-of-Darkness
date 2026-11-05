@@ -42,7 +42,7 @@ const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base
             </div>
             <h3>{featured.data.title}</h3>
             <p class="feature-description">{featured.data.description}</p>
-            <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span>·</span><span>Security analysis</span><span>·</span><span>Vendor fixes</span></div>
+            <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time></div>
           </div>
           <div class="feature-aside">
             <img class="constellation-image" src={`${base}images/cassiopeia-constellation.webp`} alt="The Cassiopeia constellation outlined against a star field" />
