@@ -1,0 +1,62 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = "Helm of Darkness",
+  description = "Independent security research into blockchain infrastructure, virtual machines, and software that handles untrusted input.",
+  image,
+} = Astro.props;
+const pageTitle = title === "Helm of Darkness" ? title : `${title} · Helm of Darkness`;
+const socialImage = image ? new URL(image, Astro.site) : undefined;
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#090b0d" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {socialImage && <meta property="og:image" content={socialImage} />}
+    <meta name="twitter:card" content={socialImage ? "summary_large_image" : "summary"} />
+    <title>{pageTitle}</title>
+  </head>
+  <body class="min-h-screen bg-ink text-paper antialiased">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
+        <a class="brand" href={base} aria-label="Helm of Darkness home">
+          <span class="brand-mark" aria-hidden="true">✳</span>
+          <span>HELM <span class="brand-muted">OF DARKNESS</span></span>
+        </a>
+        <nav class="flex items-center gap-7" aria-label="Main navigation">
+          <a class="nav-link" href={`${base}research/`}>Research</a>
+          <a class="nav-link nav-github" href="https://github.com/AnubhavDash" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    <slot />
+    <footer class="site-footer">
+      <div class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-10">
+        <p>Independent security research by <a href="https://github.com/AnubhavDash">Anubhav Dash</a>.</p>
+        <p class="footer-note">Stay curious. Look up once in a while.</p>
+      </div>
+    </footer>
+  </body>
+</html>

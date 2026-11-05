@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const posts = (await getCollection("posts", ({ data }) => data.published <= new Date()))
+  .sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout title="Research archive" description="Long-form security research, vulnerability analysis, proof of concepts, and vendor fixes.">
+  <main id="main" class="archive-page mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
+    <div class="archive-intro">
+      <p class="eyebrow">THE HELM / RESEARCH INDEX</p>
+      <h1>Reports from<br /><span>under the surface.</span></h1>
+      <p>Deep dives into bugs that hide in plain sight: how they work, what they cost, and what changed after they were found.</p>
+    </div>
+    <div class="archive-list">
+      {posts.map((post, index) => <article class="archive-row">
+        <div class="archive-number">{String(index + 1).padStart(2, "0")}</div>
+        <div class="archive-copy">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2"><time datetime={post.data.published.toISOString()}>{post.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span class="archive-dot">·</span>{post.data.tags.map((tag) => <span class="archive-tag">{tag}</span>)}</div>
+          <h2><a href={`${base}research/${post.data.slug}/`}>{post.data.title}<span aria-hidden="true"> ↗</span></a></h2>
+          <p>{post.data.description}</p>
+          {post.data.findings.length > 0 && <div class="finding-pills">{post.data.findings.map((finding) => <span>{finding.name}</span>)}</div>}
+        </div>
+      </article>)}
+      {posts.length === 0 && <p class="empty-state">No reports yet. Check back soon.</p>}
+    </div>
+  </main>
+</SiteLayout>

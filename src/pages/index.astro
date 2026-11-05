@@ -1,0 +1,64 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const posts = await getCollection("posts", ({ data }) => data.published <= new Date());
+const sortedPosts = posts.sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+const featured = sortedPosts.find((post) => post.data.featured) ?? sortedPosts[0];
+const recent = sortedPosts.filter((post) => post.id !== featured?.id).slice(0, 3);
+const base = import.meta.env.BASE_URL;
+const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base}research/`;
+---
+
+<SiteLayout image={`${base}images/milky-way.webp`}>
+  <main id="main">
+    <section class="home-hero mx-auto max-w-7xl px-6 pt-4 lg:px-10">
+      <div class="hero-frame">
+        <img class="hero-image" src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" fetchpriority="high" />
+        <div class="hero-shade"></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot"></span> Independent security research</p>
+          <h1>Curiosity is a<br /><span>useful attack surface.</span></h1>
+          <p class="hero-description">Notes from the edge of the map: virtual machines, blockchain infrastructure, and the places software forgets to count the cost.</p>
+          <a class="text-link hero-link" href={featureUrl}>Read the latest research <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-caption"><span>FIELD NOTES / 001</span><span>LOOK CLOSER</span></div>
+      </div>
+      <div class="hero-underbar"><span>RESEARCH JOURNAL</span><span>BUILT FOR THE LONG READ</span></div>
+    </section>
+
+    <section class="content-section mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-28" aria-labelledby="featured-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">01 / Featured investigation</p>
+          <h2 id="featured-heading">The latest field report</h2>
+        </div>
+        <a class="text-link archive-link" href={`${base}research/`}>All research <span aria-hidden="true">→</span></a>
+      </div>
+
+      {featured ? (
+        <a class="feature-card group" href={featureUrl}>
+          <div class="feature-index"><span>CASE FILE</span><span>001</span><span class="feature-cross" aria-hidden="true">↗</span></div>
+          <div class="feature-main">
+            <div class="flex flex-wrap gap-2">
+              {featured.data.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+            <h3>{featured.data.title}</h3>
+            <p class="feature-description">{featured.data.description}</p>
+            <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span>·</span><span>Four findings</span><span>·</span><span>Technical writeup</span></div>
+          </div>
+          <div class="feature-aside" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit-core">H/D</span><span class="feature-aside-note">TRACE<br />THE<br />ASSUMPTION</span></div>
+        </a>
+      ) : (
+        <p class="empty-state">The first field report is in progress.</p>
+      )}
+    </section>
+
+    {recent.length > 0 && <section class="recent-section"><div class="mx-auto max-w-7xl px-6 py-16 lg:px-10">
+      <div class="section-heading"><div><p class="eyebrow">02 / Latest notes</p><h2>From the archive</h2></div><a class="text-link archive-link" href={`${base}research/`}>Browse archive <span aria-hidden="true">→</span></a></div>
+      <div class="recent-grid">
+        {recent.map((post) => <a class="recent-card" href={`${base}research/${post.data.slug}/`}><p class="eyebrow">{post.data.tags[0] ?? "Research"}</p><h3>{post.data.title}</h3><p>{post.data.description}</p><time datetime={post.data.published.toISOString()}>{post.data.published.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}</time></a>)}
+      </div>
+    </div></section>}
+  </main>
+</SiteLayout>
