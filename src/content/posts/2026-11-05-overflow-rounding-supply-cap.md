@@ -1,6 +1,6 @@
 ---
 title: "Death by Decimals: Bleeding a Chain One Fraction at a Time"
-description: Validator fee shares and missed-slot penalties drifted by integer units when floating-point rounding was used for protocol accounting.
+description: Three arithmetic findings affected mint limits, validator fee allocation, and missed-slot penalties through different failures in integer and floating-point calculations.
 slug: overflow-rounding-and-a-cap-that-stopped-being-a-cap
 published: 2026-11-05
 updated: 2026-11-05
@@ -11,6 +11,11 @@ tags:
   - Vulnerability research
 featured: false
 findings:
+  - name: Staking-claim supply cap
+    severity: Moderate
+    score: CVSS 6.5
+    advisory: GHSA-wx97-fhvf-42vg
+    url: https://github.com/klever-io/klever-go/security/advisories/GHSA-wx97-fhvf-42vg
   - name: DecreaseAll penalty rounding
     severity: Moderate
     score: CVSS 4.8
@@ -23,28 +28,27 @@ findings:
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-x5mg-959h-f66v
 ---
 
-Consensus software has to turn arithmetic into state. The values may be tiny—one fee unit or one rating decrement. The arithmetic still has to preserve the rule that gives those values meaning.
+Consensus software has to turn arithmetic into state. The values may be tiny—one fee unit, one rating decrement—or large enough to cross a supply ceiling. The arithmetic still has to preserve the rule that gives those values meaning.
 
-These two reports expose different ways to lose that guarantee. In validator rewards, floating-point conversion could give one fee unit to the wrong side of a split. In missed-slot accounting, an attempted floating-point ceiling could add a failure where the division was already exact.
+These three reports expose different ways to lose that guarantee. In a staking claim, signed integer addition could wrap before a maximum-supply check. In validator rewards, floating-point conversion could give one fee unit to the wrong side of a split. In missed-slot accounting, an attempted floating-point ceiling could add a failure where the division was already exact.
 
-The common theme is arithmetic at a state boundary. The consequences are not interchangeable: one redistributed integer fee units, and one added validator penalties. Treating them as one generic “rounding bug” would hide the actual risk in each.
+The common theme is arithmetic at a state boundary. The consequences are not interchangeable: one path could invalidate a supply cap, one redistributed integer fee units, and one added validator penalties. Treating them as one generic “rounding bug” would hide the actual risk in each.
 
-## The Ceiling Tax
+## The cap compared a value that had already wrapped
 
-`DecreaseAll` calculates how many leader and validator failures to account for after missed slots. Its code aimed to implement ceiling division by calculating a floating-point ratio, adding `1 - math.SmallestNonzeroFloat64`, and converting the result to `uint32`.
+When an eligible staking account claimed APR interest, the claim path added the pending amount to the asset's `CirculatingSupply` and then compared the result with `MaxSupply`. The addition was performed in `int64`, with no overflow guard before the comparison.
 
-`math.SmallestNonzeroFloat64` is a positive subnormal value around `5e-324`. At the ordinary magnitudes of these ratios, subtracting it does not change the floating-point value. For an exact integer ratio, the expression effectively becomes `ratio + 1`; converting to an integer then adds one failure instead of returning the exact quotient.
+The intended check is straightforward: if the current circulation plus the reward exceeds a positive maximum, refuse the claim. But if the sum wraps negative, then `negative > MaxSupply` is false. The check accepts the claim, and the code updates both `CirculatingSupply` and `MintedValue` with the wrapped values.
 
-The advisory gives a concrete batch: 21 elected validators and 105 missed slots. The correct leader count is `ceil(105 / 21)`, or 5. The implementation produced 6. With an effective consensus group of 20, the expected validator count was 100, but the implementation produced 101. Each validator processed in the batch received an extra leader-failure and validator-failure decrement. If a validator was already near a rating or jailing threshold, an extra decrement could matter.
+That is worse than one oversize reward. The counters themselves can become negative. Later cap checks compare new claims against that negative baseline, so the asset's configured maximum no longer constrains the subsequent arithmetic in the intended way. The report contrasts this path with a sibling SFT circulation function that already had an overflow guard, while the staking-claim site did not.
 
-This path is reached when the validator-state processor handles a missed-slot interval that routes through `DecreaseAll`. It is not a floating-point glitch at random: exact divisibility is precisely where the attempted “just under one” adjustment fails, because the adjustment is too small to exist at that scale.
+This is a state invariant failure: the check tests the result after computing it in the same type that can overflow. A safe implementation can reject before addition when `amount` exceeds `MaxInt64 - current`, use a wider or arbitrary-precision intermediate, or use a checked-add helper. Whichever form is chosen, the predicate has to reason about the mathematical sum, not a wrapped representation of it.
 
-For integer inputs, ceiling division can be stated without an epsilon: divide to get the quotient, inspect the remainder, and add one only when the remainder is non-zero. That rule behaves correctly for both the 105/21 case and an interval such as 106/21. It also gives a direct test table: exact multiples must remain unchanged, while a non-zero remainder must advance to the next whole count. A magic tiny floating-point decrement has no such dependable meaning after rounding.
+The order of these operations matters as much as the type. A check written after `current += amount` can inspect only the already-updated value; if the update wrapped, the original operands have been lost unless they were saved. The safer sequence is to validate the increment against the remaining range first and mutate both `CirculatingSupply` and `MintedValue` only after the check passes. That gives the asset counters an all-or-nothing update instead of leaving a cap failure halfway through state accounting.
 
-The advisory is [GHSA-w99g-8m9m-jrf7](https://github.com/klever-io/klever-go/security/advisories/GHSA-w99g-8m9m-jrf7), rated Moderate and patched in `1.7.22`. GitHub credits me as a Reporter.
+The advisory rates this High-impact integrity issue Moderate and lists `1.7.22` as patched: [GHSA-wx97-fhvf-42vg](https://github.com/klever-io/klever-go/security/advisories/GHSA-wx97-fhvf-42vg). GitHub credits me as a Finder.
 
-
-## Loose Change
+## A fee split can conserve the total and still be wrong
 
 The validator-fee issue is narrower. After a successful block, `UpdateValidatorInfoOnSuccessfulBlock` apportions accumulated transaction fees between the block leader and the other successful signers. The per-validator amount was calculated using `float64`, converted to `int64`, and then multiplied across validator recipients. The leader received the remainder.
 
@@ -60,13 +64,28 @@ The arithmetic path runs after a successful block and uses the proposal paramete
 
 Integer accounting usually makes this easier to reason about. Calculate the share as an integer numerator divided by an integer denominator, define which side receives the remainder, and ensure that the resulting allocations sum to the original amount. The division and remainder then express the policy directly instead of routing it through a floating-point approximation.
 
+## “Add almost one” added one even when none was needed
+
+`DecreaseAll` calculates how many leader and validator failures to account for after missed slots. Its code aimed to implement ceiling division by calculating a floating-point ratio, adding `1 - math.SmallestNonzeroFloat64`, and converting the result to `uint32`.
+
+`math.SmallestNonzeroFloat64` is a positive subnormal value around `5e-324`. At the ordinary magnitudes of these ratios, subtracting it does not change the floating-point value. For an exact integer ratio, the expression effectively becomes `ratio + 1`; converting to an integer then adds one failure instead of returning the exact quotient.
+
+The advisory gives a concrete batch: 21 elected validators and 105 missed slots. The correct leader count is `ceil(105 / 21)`, or 5. The implementation produced 6. With an effective consensus group of 20, the expected validator count was 100, but the implementation produced 101. Each validator processed in the batch received an extra leader-failure and validator-failure decrement. If a validator was already near a rating or jailing threshold, an extra decrement could matter.
+
+This path is reached when the validator-state processor handles a missed-slot interval that routes through `DecreaseAll`. It is not a floating-point glitch at random: exact divisibility is precisely where the attempted “just under one” adjustment fails, because the adjustment is too small to exist at that scale.
+
+For integer inputs, ceiling division can be stated without an epsilon: divide to get the quotient, inspect the remainder, and add one only when the remainder is non-zero. That rule behaves correctly for both the 105/21 case and an interval such as 106/21. It also gives a direct test table: exact multiples must remain unchanged, while a non-zero remainder must advance to the next whole count. A magic tiny floating-point decrement has no such dependable meaning after rounding.
+
+The advisory is [GHSA-w99g-8m9m-jrf7](https://github.com/klever-io/klever-go/security/advisories/GHSA-w99g-8m9m-jrf7), rated Moderate and patched in `1.7.22`. GitHub credits me as a Reporter.
+
 ## Arithmetic needs a stated invariant
 
 The repairs for these cases should not be reduced to “use integers everywhere” or “avoid floats.” The useful question is what invariant the operation must preserve:
 
+- A supply increment must not cross `MaxSupply`, and neither counter may wrap.
 - A fee split must allocate exactly the amount collected, according to a documented remainder rule.
 - A missed-slot count must implement mathematical ceiling division, including when the division is exact.
 
-Those statements are small enough to write as tests: fee shares add back to the input and match the specified split; exact and non-exact quotients produce the intended penalty counts. The tests then pin the economic or protocol rule, rather than a particular intermediate formula.
+Those statements are small enough to write as tests: a claim one unit below the maximum succeeds while one that would overflow is refused; fee shares add back to the input and match the specified split; exact and non-exact quotients produce the intended penalty counts. The tests then pin the economic or protocol rule, rather than a particular intermediate formula.
 
-Both advisories list `1.7.22` as patched. Their official severity, metrics, affected versions, and credits remain in the linked GHSAs. The fixes address distinct paths, but each protects the same thing: a numeric value must mean what the protocol says it means when it changes rewards or validator state.
+All three advisories list `1.7.22` as patched. Their official severity, metrics, affected versions, and credits remain in the linked GHSAs. The fixes address distinct paths, but each protects the same thing: a numeric value must mean what the protocol says it means at the moment it changes balances, supply, rewards, or validator state.

@@ -45,7 +45,7 @@ The interface boundary is easy to miss when reading a hook in isolation. A contr
 
 That makes the timing of a charge part of the security boundary. If a hook computes an amount and passes it to a helper that only increments a counter, the final transaction can still fail as out of gas. That failure does not undo a slice allocation or return the CPU time spent constructing a number. A bounded charge has to run before the work and has to be allowed to reject it.
 
-## Pay After the Work
+## What the gas meter could—and could not—do
 
 Klever's VM exposes host functions to contracts. The contract passes handles and lengths; Go code behind a hook allocates buffers, creates `big.Int` values, decodes vectors, and snapshots managed state. Gas is supposed to limit the amount of that work. But not every helper named `UseGas` actually checks the remaining budget.
 
@@ -53,7 +53,7 @@ Some helpers record or trace a gas amount and return no error. They are useful f
 
 That difference is the center of these reports. The bug was not simply that an operation had a high cost. In three cases, the code had a cost calculation that did not bound the work. In the fourth, the snapshot was not charged at all.
 
-## Shift Happens
+## BigIntShl built the result before charging for its size
 
 `BigIntShl` accepts a source handle and a signed 32-bit shift count. The hook checks that the input integer and shift count are non-negative. It also accounts for copying the input. It does not put a useful ceiling on a large positive shift.
 
@@ -85,7 +85,7 @@ There was a useful comparison nearby. `BigIntPow` estimates its output size and 
 
 The `FixAuditChangesV6` path now computes that byte length, applies the bounded charge, and only then calls `Lsh`. If the caller cannot pay, no 256 MiB result is built. This was my September 14 report, [GHSA-r2gq-244g-h8p2](https://github.com/klever-io/klever-go/security/advisories/GHSA-r2gq-244g-h8p2), rated High.
 
-## Two Gigs on a Thousand Gas
+## MBufferSetRandom had a charge, but no effective limit
 
 `MBufferSetRandom` takes a managed-buffer destination and a caller-controlled `int32` length. Before the fix, it rejected non-positive lengths and had no upper bound for positive ones. A contract could request a length near `math.MaxInt32`.
 
@@ -112,7 +112,7 @@ The charge call comes first. The defect is that this helper has no bounded failu
 
 `MBufferSetRandom` was the report I filed, not the whole discovery credit for the hook family. CertiK's KLR-50 work covered the broader pattern and a private fix already existed. The advisory credits CertiK for that cluster and recognizes my independent report on this specific function.
 
-## The Photocopier Tax
+## A 128 KiB vector described 2 GiB of copies
 
 `readKDATransfers` decodes a byte vector into KDA transfer objects. Each record is 16 bytes: a four-byte token-identifier handle, an eight-byte nonce, and a four-byte bigint handle. The vector stores references to managed objects; it does not contain the token identifiers themselves.
 
@@ -143,9 +143,9 @@ The advisory credits three finders, including me, and says maintainers found the
 
 The `FixAuditChangesV6` repair caps the vector, calculates the cost of the token identifiers using their stored lengths, and applies a bounded charge before cloning them. It rejects a vector that cannot afford its transfers before constructing the decoded records. This closes the amplification at the point where the host would otherwise begin copying.
 
-The first managed-vector decoder is a related finding, [GHSA-qqr9-92pp-89p7](https://github.com/klever-io/klever-go/security/advisories/GHSA-qqr9-92pp-89p7). I cover its repeated-handle amplification alongside nested output growth in *The Silent Siege*; it is indexed under the Exponential family here.
+The transfer decoder has a sibling with the same ordering mistake but a different input format. `ReadManagedVecOfManagedBuffers` reads four-byte managed-buffer handles and clones each referenced byte slice before charging for it. Repeating one handle is enough: the advisory's real-WASM reproduction used 1,024 references to a 64 KiB buffer and measured about 64 MiB of clone traffic. The managed write-log hook then charged for topic and data bytes again, so the observed gas total includes both the decoder's unbounded record and the hook-level charge. This separate report is [GHSA-qqr9-92pp-89p7](https://github.com/klever-io/klever-go/security/advisories/GHSA-qqr9-92pp-89p7); GitHub credits me as a Reporter. It belongs in the same resource-accounting family, though the four findings above are the ones examined in depth here.
 
-## Handle With Care
+## PushState copied 199,000 handles for zero gas
 
 The previous three findings involve attacker-controlled output size or repeated copies. `PushState` was different: it copied a collection that the contract had already populated.
 

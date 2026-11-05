@@ -1,6 +1,6 @@
 ---
 title: The Bigger the Theft, the Smaller the Number
-description: Three managed-buffer bounds checks and one staking supply cap trusted sums that had already wrapped, turning large values into small or negative ones.
+description: Three managed-buffer imports added attacker-controlled int32 offsets before widening them, turning an invalid slice into a host panic and a full-gas loss.
 slug: the-addition-overflowed-before-the-bounds-check
 published: 2026-11-05
 updated: 2026-11-05
@@ -26,22 +26,15 @@ findings:
     score: CVSS 7.5
     advisory: GHSA-wjrx-39g9-j97q
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-wjrx-39g9-j97q
-  - name: Staking-claim supply cap
-    severity: Moderate
-    score: CVSS 6.5
-    advisory: GHSA-wx97-fhvf-42vg
-    url: https://github.com/klever-io/klever-go/security/advisories/GHSA-wx97-fhvf-42vg
 ---
 
 The bounds check was there. It checked for negative values and compared the requested end position with the source length. The problem was the order of operations: two signed 32-bit values were added first, and only the wrapped result was converted to the host's `int` type.
 
 At the managed-buffer boundary, that distinction decides whether the VM returns an ordinary error or the Go runtime panics. A contract cannot write a Go slice expression itself, but it can pass an offset and a length to a host import. The import resolves the managed handle and performs the slice. If the guard is fooled, the panic happens in node code.
 
-Three reports cover the same arithmetic mistake in separate operations: copying a byte slice out of a managed buffer, reading a byte slice into VM memory, and writing a byte slice into a managed buffer. A fourth applies the same general lesson to staking supply: a cap is only meaningful if the value being compared has not already wrapped. Each import and state transition has its own route and needs its own regression coverage.
+The three reports cover the same arithmetic mistake in separate operations: copying a byte slice out of a managed buffer, reading a byte slice into VM memory, and writing a byte slice into a managed buffer. They are related, but they are not one finding repeated three times. Each WASM import has its own route to the vulnerable check, and each needed its own regression coverage.
 
-## 1 + MaxInt32
-
-### The cast happened after the overflow
+## The cast happened after the overflow
 
 In `MBufferCopyByteSlice`, the vulnerable condition was equivalent to:
 
@@ -66,7 +59,7 @@ The operations also reached the check through different helper paths. `MBufferCo
 
 That difference matters for regression tests. A single helper-level check can protect two call sites if they truly share the helper, but it will not prove that the third import is safe. Each import needs a case that exercises its real exported path with values that overflow at 32 bits. For `CopyByteSlice` and `GetByteSlice`, the report uses `start = 1` and `length = math.MaxInt32`. For `SetByteSlice`, the active length cap means the useful case is `start = math.MaxInt32` and `length = 1`.
 
-### Why a panic mattered to a contract caller
+## Why a panic mattered to a contract caller
 
 These imports were registered as fast VM hooks. Their ordinary failure path was meant to return a status through `WithFault`; a Go panic is outside that mechanism. The panic unwound to the recovery around smart-contract execution, which returned `ErrExecutionPanicked` with no useful VM output. The transaction processor then consumed the caller's gas limit.
 
@@ -74,7 +67,7 @@ That made the consequence concrete: the malformed slice did not just make one ho
 
 This is a useful distinction when describing VM panics. The Go runtime recovery prevented an uncontrolled process crash in this path, but it did not turn the operation into a normal contract error. The transaction still failed at a coarse boundary and paid the entire gas limit. Recovery kept the host alive; it did not preserve the caller's execution budget.
 
-### One arithmetic rule for all three imports
+## One arithmetic rule for all three imports
 
 The safer pattern is to prove the start is within the buffer, then prove the requested length fits in the remaining suffix. In abstract form:
 
@@ -97,7 +90,7 @@ The full-gas result also explains why “the process recovered” is an incomple
 
 The test cases should include the exact wrap boundary, not just a very large valid range or a normal out-of-bounds range. Ordinary checks such as a small buffer with `start = len` and `length = 1` exercise the guard's intended behavior. They do not show that `start + length` can become negative before the comparison. A regression test must make the intermediate sum overflow while keeping both individual inputs non-negative, then assert that the hook returns its normal failure result without panicking.
 
-### The fix and the advisory record
+## The fix and the advisory record
 
 All three advisories list `1.7.21-rc3` as the patched version. They describe the same underlying implementation mistake and the same execution consequence, while keeping the import-specific cases separate:
 
@@ -108,11 +101,3 @@ All three advisories list `1.7.21-rc3` as the patched version. They describe the
 GitHub credits me as a Finder for the copy and set imports, and as a Reporter for the get import. The severity and credits belong to each GHSA record; grouping the code paths here does not collapse those records or change who found which one.
 
 When a hook takes two `int32` values that jointly define a memory range, reviewing the comparison alone is not enough. Read the types through the addition, the cast, and the final slice expression. The bug lived in the gap between those three lines.
-
-## Larger Is Smaller
-
-The staking supply-cap report is a different code path, but the same arithmetic trap: the guard compared a wrapped result. When an eligible account claimed APR interest, the code added the pending amount to `CirculatingSupply` as an `int64` and then compared the sum with `MaxSupply`. If the addition overflowed to a negative number, the comparison passed. The claim could then write the wrapped values to both `CirculatingSupply` and `MintedValue`.
-
-That can leave the counters negative, so later claims compare against a corrupted baseline. The cap no longer expresses the configured maximum in the way it was intended to. The safe order is to check the increment against the remaining range before adding, or use a checked wider intermediate, and update both counters only after the check succeeds.
-
-The report is [GHSA-wx97-fhvf-42vg](https://github.com/klever-io/klever-go/security/advisories/GHSA-wx97-fhvf-42vg), rated Moderate and patched in `1.7.22`. GitHub credits me as a Finder.

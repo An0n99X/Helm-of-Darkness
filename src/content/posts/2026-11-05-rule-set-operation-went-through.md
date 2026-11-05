@@ -1,6 +1,6 @@
 ---
 title: Smuggled Through the Storefront While the Border Guards Slept
-description: Marketplace, ITO, staking, royalty, and metadata paths moved balances or changed assets without applying the policies their neighboring operations enforced.
+description: Five Klever Go findings show how balance-moving and asset-update paths bypassed policies enforced by their neighboring operations.
 slug: the-rule-was-set-the-operation-still-went-through
 published: 2026-11-05
 updated: 2026-11-05
@@ -44,7 +44,7 @@ The affected code sat in three parts of the application: marketplace settlement,
 
 These are policy enforcement bugs, not cryptographic bypasses. The balance ledger did what those functions asked. The missing step was checking the rule that should have decided whether the operation was allowed.
 
-## The Back Door Bazaar
+## A transfer rule can disappear inside a settlement
 
 The standard KDA transfer path checks currency attributes. It rejects a paused currency and applies `LimitTransfer` roles before moving the balance. The marketplace's `Buy` path did not use that policy-aware route for its settlement currency. It removed the bid from the buyer and credited the seller, prior bidder, referral address, and royalty recipients with direct balance operations.
 
@@ -52,15 +52,13 @@ The currency was selected for the order. `Sell` accepted a seller-chosen settlem
 
 That is an important boundary: a marketplace should not become an alternate transfer primitive with fewer rules. A restriction attached to the currency has to apply when the marketplace moves it, regardless of whether the movement is called a transfer, a bid, a refund, or seller settlement.
 
-## Launchpad Loophole
-
 The ITO path had a similar issue with a different route. `Buy` resolved the purchase price and currency, then debited the buyer and credited the ITO receiver directly. Percentage royalties and split recipients were also credited in that currency. The transaction path did not check `IsPaused` or the `LimitTransfer` rule. A recipient could configure an ITO priced in a restricted currency, and a holder could purchase through it even when the canonical transfer path refused that movement.
 
 The issuer of the restricted currency did not have to participate in the purchase. A contract holding restricted balances could also reach the path through the `kleverBuy` builtin. The issue was not that an unauthorized account changed the currency's settings; it was that the purchase operation moved balances without consulting the settings already in force.
 
 Those two policy checks answer different questions. `IsPaused` says whether a currency can move at all through the relevant transfer operation. `LimitTransfer` asks whether the sender and receiver satisfy the asset's transfer-role rule. A correct settlement needs both answers for its actual source and destination. Checking only the payer's balance, or validating the order when it was created, says nothing about whether this later movement is allowed.
 
-## Rewards Without Rules
+## Staking made the route less obvious
 
 The FPR finding is easier to miss because the deposit and reward claim happen at different times and can involve different accounts.
 
@@ -74,13 +72,11 @@ The three transfer-policy advisories cover separate application paths: [marketpl
 
 The PoCs for these paths were useful because they compared the exceptional route with the normal one using the same currency settings. A standard transfer failed with the paused or transfer-restricted result. The marketplace, ITO, and deposit/reward sequences nevertheless completed their own balance changes. That contrast isolates the policy gap: the asset flag was loaded and understood by the canonical route, but the alternate state transition did not ask it.
 
-## Frozen, Allegedly
+## Stop flags must reach every update branch
 
 The other two findings involve a different kind of policy: an owner or admin can permanently stop a class of changes, but the stop check was not consistently applied.
 
 For royalties, `StopRoyaltiesChange` sets `IsRoyaltiesChangeStopped`. Updates to royalty parameters checked that flag. The separate `updateRoyaltiesReceiver` path did not; after confirming the caller was the owner or admin, it rewrote `asset.Royalties.Address`. The same asset could therefore reject a royalty-parameter update and accept a recipient change after the stop had been set.
-
-## Sealed, Then Edited
 
 For metadata, `StopNFTMetadataChange` applies to nonce-bearing assets, including SFTs. The NFT update path checked the flag. The SFT dispatcher sent updates to `updateMetadataV2`, which wrote metadata without making the same check. An owner or admin could update SFT metadata after the stop, while an NFT update with the same flag was refused.
 
