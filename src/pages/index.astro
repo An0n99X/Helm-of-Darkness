@@ -44,7 +44,10 @@ const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base
             <p class="feature-description">{featured.data.description}</p>
             <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time><span>·</span><span>Security analysis</span><span>·</span><span>Vendor fixes</span></div>
           </div>
-          <div class="feature-aside" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit-core">H/D</span><span class="feature-aside-note">TRACE<br />THE<br />ASSUMPTION</span></div>
+          <div class="feature-aside">
+            <img class="constellation-image" src={`${base}images/cassiopeia-constellation.webp`} alt="The Cassiopeia constellation outlined against a star field" />
+            <span class="constellation-caption">CASSIOPEIA</span>
+          </div>
         </a>
       ) : (
         <p class="empty-state">No reports published yet.</p>

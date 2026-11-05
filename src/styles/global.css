@@ -67,11 +67,9 @@ a { color: inherit; text-decoration: none; }
 .feature-main h3 { max-width: 740px; margin: 1.25rem 0 .8rem; color: #f0eee6; font: 600 clamp(1.85rem, 4vw, 3.4rem)/1.02 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
 .feature-description { max-width: 630px; margin: 0; color: #aeb0a9; font-size: 1rem; line-height: 1.7; }
 .feature-meta { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.6rem; color: #7f837b; font: .65rem "DM Mono", monospace; }
-.feature-aside { position: relative; display: grid; place-items: center; overflow: hidden; border-left: 1px solid var(--line); background: radial-gradient(ellipse at 40% 45%, rgba(196, 241, 91, .11), transparent 55%); }
-.orbit { position: absolute; width: 175px; height: 175px; border: 1px solid rgba(196, 241, 91, .25); border-radius: 50%; transform: rotate(-28deg) scaleY(.4); }
-.orbit-two { width: 225px; height: 225px; transform: rotate(45deg) scaleY(.36); border-color: rgba(233, 231, 223, .14); }
-.orbit-core { display: grid; z-index: 1; width: 74px; height: 74px; place-items: center; border: 1px solid var(--signal); border-radius: 50%; color: var(--signal); font: .75rem "DM Mono", monospace; box-shadow: 0 0 42px rgba(196, 241, 91, .12); }
-.feature-aside-note { position: absolute; right: 1rem; bottom: 1rem; color: #777c70; font: .55rem/1.6 "DM Mono", monospace; letter-spacing: .12em; text-align: right; }
+.feature-aside { position: relative; overflow: hidden; border-left: 1px solid var(--line); background: #0c1014; }
+.constellation-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center; opacity: .86; }
+.constellation-caption { position: absolute; right: 0; bottom: 0; left: 0; display: flex; min-height: 3.25rem; align-items: center; justify-content: center; border-top: 1px solid rgba(196, 241, 91, .35); background: linear-gradient(0deg, rgba(9, 11, 13, .98), rgba(9, 11, 13, .86)); color: var(--signal); font: 500 .66rem "DM Mono", monospace; letter-spacing: .18em; }
 .recent-section { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #0d1011; }
 .recent-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .recent-card { min-height: 230px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1.5rem; transition: background .2s ease; }
