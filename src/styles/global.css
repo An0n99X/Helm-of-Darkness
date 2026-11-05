@@ -126,7 +126,6 @@ a { color: inherit; text-decoration: none; }
 .article-sidebar ul { display: grid; gap: .7rem; margin: 0; padding: 0; list-style: none; }
 .article-sidebar a { color: #969990; font-size: .76rem; line-height: 1.45; transition: color .2s ease; }
 .article-sidebar a:hover { color: var(--signal); }
-.sidebar-source { display: inline-block; margin-top: 1.5rem; color: #74786f !important; font: .6rem "DM Mono", monospace; }
 .article-content { min-width: 0; color: #c8c9c1; font-size: 1.015rem; line-height: 1.85; }
 .article-content > :first-child { margin-top: 0; }
 .article-content p { margin: 0 0 1.45rem; }
@@ -162,7 +161,6 @@ a { color: inherit; text-decoration: none; }
   .article-layout { grid-template-columns: 1fr; gap: 2rem; }
   .article-sidebar { position: static; border: 1px solid var(--line); padding: 1rem; }
   .article-sidebar ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sidebar-source { margin-top: 1rem; }
 }
 @media (max-width: 640px) {
   .site-header-inner { padding-top: 1rem; padding-bottom: 1rem; }

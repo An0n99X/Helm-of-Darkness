@@ -33,7 +33,6 @@ const base = import.meta.env.BASE_URL;
       <aside class="article-sidebar" aria-label="Article contents">
         <p class="eyebrow">IN THIS REPORT</p>
         <nav><ul>{headings.filter((heading) => heading.depth === 2).map((heading) => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ul></nav>
-        <a class="sidebar-source" href="https://github.com/AnubhavDash/Helm-of-Darkness/tree/main/src/content/posts" target="_blank" rel="noreferrer">Browse Markdown posts ↗</a>
       </aside>
       <article class="article-content"><Content /></article>
     </div>
