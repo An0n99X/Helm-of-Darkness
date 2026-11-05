@@ -30,7 +30,7 @@ a { color: inherit; text-decoration: none; }
 .skip-link:focus { top: 1rem; }
 .site-header { position: relative; z-index: 4; border-bottom: 1px solid var(--line); background: #090b0d; }
 .brand { display: inline-flex; align-items: center; gap: .65rem; font: 600 .8rem "DM Mono", monospace; letter-spacing: .08em; }
-.brand-mark { display: block; width: 27px; height: 27px; flex: 0 0 27px; }
+.brand-mark { display: block; width: 27px; height: 27px; flex: 0 0 27px; object-fit: contain; }
 .brand-muted { color: #979a92; }
 .nav-link { color: #b6b7b1; font-size: .83rem; transition: color .2s ease; }
 .nav-link:hover, .nav-link:focus-visible { color: var(--signal); }
