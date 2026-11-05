@@ -160,8 +160,9 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 900px) {
   .feature-card { grid-template-columns: 54px minmax(0, 1fr); }
   .feature-aside { grid-column: 1 / -1; min-height: 210px; border-top: 1px solid var(--line); border-left: 0; }
-  .article-layout { grid-template-columns: 1fr; gap: 2rem; }
-  .article-sidebar { position: static; border: 1px solid var(--line); padding: 1rem; }
+  .article-layout { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .article-sidebar { position: static; min-width: 0; border: 1px solid var(--line); padding: 1rem; }
+  .article-sidebar nav { min-width: 0; max-width: 100%; }
   .article-sidebar ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
@@ -185,7 +186,8 @@ a { color: inherit; text-decoration: none; }
   .feature-index { grid-column: 1; flex-direction: row; writing-mode: horizontal-tb; border-right: 0; border-bottom: 1px solid var(--line); padding: .8rem 1rem; }
   .feature-main { padding: 1.35rem 1.15rem; }
   .feature-main h3 { font-size: clamp(1.8rem, 8vw, 2.2rem); }
-  .feature-aside { grid-column: 1; min-height: 135px; border-top: 1px solid var(--line); border-left: 0; }
+  .feature-aside { grid-column: 1; min-height: 0; aspect-ratio: 3 / 2; border-top: 1px solid var(--line); border-left: 0; }
+  .constellation-image { object-fit: contain; }
   .feature-meta { font-size: .68rem; }
   .recent-grid { grid-template-columns: 1fr; }
   .recent-card { min-height: auto; }
@@ -219,8 +221,10 @@ a { color: inherit; text-decoration: none; }
   .article-dek { font-size: 1.05rem; }
   .article-content { font-size: 1rem; line-height: 1.75; }
   .article-content h2 { margin-top: 3rem; scroll-margin-top: 1rem; }
-  .article-content pre { max-width: calc(100vw - 2rem); margin-right: 0; margin-left: 0; padding: .85rem; font-size: .68rem; line-height: 1.6; }
-  .article-content table { font-size: .76rem; }
+  .article-content pre { max-width: 100%; margin-right: 0; margin-left: 0; overflow-x: hidden; padding: .85rem; font-size: .68rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .article-content pre code, .article-content pre code .line { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .article-content table { display: table; width: 100%; table-layout: fixed; overflow: visible; font-size: .7rem; }
+  .article-content td, .article-content th { padding: .4rem .3rem; white-space: normal; overflow-wrap: anywhere; }
   .back-link { margin-bottom: 2rem; }
   .site-footer > div { gap: .6rem; }
 }
