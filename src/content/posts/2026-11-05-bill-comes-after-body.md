@@ -1,6 +1,6 @@
 ---
-title: Four Ways VM Work Escaped Gas Limits
-description: Four Klever Go findings exposed host allocations, copies, and state snapshots that gas could not stop in time.
+title: The Bill Comes After the Body
+description: An investigation of four Klever Go VM findings where gas metering failed to bound allocations, repeated copies, and state snapshots.
 slug: the-bill-comes-after-the-body
 published: 2026-11-05
 updated: 2026-11-05
