@@ -1,6 +1,6 @@
 # Helm of Darkness
 
-An independent security research journal covering blockchain infrastructure, virtual machines, and software that handles untrusted input.
+An independent security research journal for long-form investigations into software behavior, failure, and repair.
 
 **Website:** <https://anubhavdash.github.io/Helm-of-Darkness/>
 

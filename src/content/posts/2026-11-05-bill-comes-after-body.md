@@ -1,6 +1,6 @@
 ---
 title: The Bill Comes After the Body
-description: Four gas-bypass vulnerabilities in a Go virtual machine, with reproducible proof of concepts, measured impact, and the vendor fixes.
+description: One 2,000-gas shift could make a validator allocate 256 MiB before the VM checked the bill. It was the sharpest of four ways this node made the network pay first.
 slug: the-bill-comes-after-the-body
 published: 2026-11-05
 updated: 2026-11-05
