@@ -1,5 +1,8 @@
 # Helm-of-Darkness
 
+<!-- Milky Way hero — background for the GitHub Pages blog -->
+<img src="assets/milky-way.webp" width="100%" alt="Milky Way over hills" />
+
 ## Security Advisory Blogs
 
 Repository for security advisory writeups and blog posts about blockchain VM vulnerabilities, gas analysis, and smart contract research.
