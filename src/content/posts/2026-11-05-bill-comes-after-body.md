@@ -2,7 +2,7 @@
 title: The Bill Comes After the Body
 description: An investigation of four Klever Go VM findings where gas metering failed to bound allocations, repeated copies, and state snapshots.
 slug: the-bill-comes-after-the-body
-published: 2026-11-05
+published: 2026-10-26
 updated: 2026-11-05
 tags:
   - Go

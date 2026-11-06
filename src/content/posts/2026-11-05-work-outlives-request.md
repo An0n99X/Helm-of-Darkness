@@ -2,7 +2,7 @@
 title: "The Silent Siege: A Thousand Open Doors, Nobody Knocking"
 description: "Three node-availability findings followed different lifetimes: a goroutine outlived its peer message, nested output outgrew its contract call, and a startup-time API request reached state that was not ready."
 slug: the-work-that-outlives-the-request
-published: 2026-11-05
+published: 2026-10-26
 updated: 2026-11-05
 tags:
   - Node security

@@ -2,7 +2,7 @@
 title: The Bigger the Theft, the Smaller the Number
 description: Three managed-buffer imports added attacker-controlled int32 offsets before widening them, turning an invalid slice into a host panic and a full-gas loss.
 slug: the-addition-overflowed-before-the-bounds-check
-published: 2026-11-05
+published: 2026-09-21
 updated: 2026-11-05
 tags:
   - Go

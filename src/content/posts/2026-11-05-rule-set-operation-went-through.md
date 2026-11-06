@@ -2,7 +2,7 @@
 title: Smuggled Through the Storefront While the Border Guards Slept
 description: Five Klever Go findings show how balance-moving and asset-update paths bypassed policies enforced by their neighboring operations.
 slug: the-rule-was-set-the-operation-still-went-through
-published: 2026-11-05
+published: 2026-10-27
 updated: 2026-11-05
 tags:
   - Blockchain security

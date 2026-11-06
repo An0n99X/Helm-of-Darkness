@@ -2,7 +2,7 @@
 title: "Death by Decimals: Bleeding a Chain One Fraction at a Time"
 description: Three arithmetic findings affected mint limits, validator fee allocation, and missed-slot penalties through different failures in integer and floating-point calculations.
 slug: overflow-rounding-and-a-cap-that-stopped-being-a-cap
-published: 2026-11-05
+published: 2026-10-26
 updated: 2026-11-05
 tags:
   - Go
