@@ -23,7 +23,7 @@ findings:
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-3xw3-gjh2-5j94
   - name: BigIntShl
     severity: High
-    score: CVSS 8.6
+    score: CVSS 7.5
     advisory: GHSA-r2gq-244g-h8p2
     url: https://github.com/klever-io/klever-go/security/advisories/GHSA-r2gq-244g-h8p2
   - name: PushState
