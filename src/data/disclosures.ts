@@ -1,9 +1,9 @@
-export type DisclosureKind = "GHSA" | "Accepted fix";
+export type DisclosureKind = "GHSA" | "Accepted fix" | "Accepted report";
 export type Severity = "High" | "Moderate" | "Low" | "Accepted";
 
 export interface Disclosure {
   id: string;
-  project: "Klever Go";
+  project: "Klever Go" | "FFmpeg";
   kind: DisclosureKind;
   severity: Severity;
   category: string;
@@ -12,7 +12,11 @@ export interface Disclosure {
   impact: string;
   credit?: "Finder" | "Reporter";
   date: string;
-  url: string;
+  url?: string;
+  cvss?: string;
+  cvssVector?: string;
+  programStatus?: string;
+  sourceProgram?: string;
 }
 
 const kleverAdvisory = (
@@ -58,6 +62,51 @@ export const disclosures: Disclosure[] = [
   kleverAdvisory("GHSA-v8j2-98j2-rqv2", "A peer can hold a stream open indefinitely", "P2P & node liveness", "High", "Reporter", "directStreamHandler did not set a read deadline before waiting for peer data.", "A connected peer can pin a goroutine per open stream.", "2026-09"),
   kleverAdvisory("GHSA-hw69-3fg8-wrmm", "Nested output merges grow deleted-account data", "P2P & node liveness", "High", "Reporter", "Successful sibling calls repeatedly duplicated inherited DeletedAccounts entries during output merging.", "Nested VM execution can amplify memory and delay validators."),
   kleverAdvisory("GHSA-g797-9c85-644m", "Missing block header crashes allowance lookup", "P2P & node liveness", "Moderate", "Reporter", "GetAvailableClaim dereferenced a nil current block header in a helper goroutine.", "An API allowance query can terminate the node process.", "2026-09"),
+  {
+    id: "YWH-PGM40646-17",
+    project: "FFmpeg",
+    kind: "Accepted report",
+    severity: "High",
+    category: "Native memory safety",
+    title: "Odd-sized frames trigger an over-read in downscale()",
+    summary: "In vf_find_rect.c, downscale() rounds odd input dimensions up for the output mipmap, then reads every output sample as a full 2×2 input block. The final sample can cross the valid input data by one byte.",
+    impact: "Processing a crafted frame can read adjacent heap data or crash the process.",
+    date: "2025-12-14",
+    cvss: "8.2",
+    cvssVector: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:H",
+    programStatus: "Accepted · fix confirmed",
+    sourceProgram: "FFmpeg Bug Bounty Program",
+  },
+  {
+    id: "YWH-PGM40646-15",
+    project: "FFmpeg",
+    kind: "Accepted report",
+    severity: "High",
+    category: "Native memory safety",
+    title: "find_rect compare() reads past the haystack frame",
+    summary: "In vf_find_rect.c, search bounds can extend beyond the haystack dimensions. compare() then walks the object width without checking each read against the remaining haystack row.",
+    impact: "An out-of-bounds heap read can expose adjacent data or crash FFmpeg while comparing pixels.",
+    date: "2025-12-13",
+    cvss: "8.2",
+    cvssVector: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:H",
+    programStatus: "Accepted · fix confirmed",
+    sourceProgram: "FFmpeg Bug Bounty Program",
+  },
+  {
+    id: "YWH-PGM40646-14",
+    project: "FFmpeg",
+    kind: "Accepted report",
+    severity: "Low",
+    category: "Integer bounds",
+    title: "Scale expression division by zero feeds overflowing dimensions",
+    summary: "A scale expression can divide by zero in expression evaluation. The resulting extreme value is not rejected before ff_scale_adjust_dimensions() performs further dimension arithmetic at scale_eval.c:144.",
+    impact: "The chained signed integer overflow can produce invalid scale dimensions and a processing failure.",
+    date: "2025-12-13",
+    cvss: "3.7",
+    cvssVector: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    programStatus: "Accepted · fix confirmed",
+    sourceProgram: "FFmpeg Bug Bounty Program",
+  },
   {
     id: "Klever Go · v1.7.22",
     project: "Klever Go",
@@ -110,3 +159,4 @@ export const disclosures: Disclosure[] = [
 
 export const publishedAdvisoryCount = disclosures.filter((item) => item.kind === "GHSA").length;
 export const acceptedFixCount = disclosures.filter((item) => item.kind === "Accepted fix").length;
+export const acceptedReportCount = disclosures.filter((item) => item.kind === "Accepted report").length;

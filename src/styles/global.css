@@ -60,7 +60,7 @@ a { color: inherit; text-decoration: none; }
 .hero-audit-arrow { flex: 0 0 auto; font: 600 1.35rem/1 "DM Mono", monospace; }
 .hero-coordinate { position: absolute; right: 1.5rem; bottom: 1.25rem; z-index: 1; display: flex; gap: 1.2rem; color: rgba(233, 231, 223, .75); font: .65rem "DM Mono", monospace; letter-spacing: .1em; }
 
-.proof-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 1rem; border-bottom: 1px solid var(--line); padding-top: 1.35rem; padding-bottom: 1.35rem; }
+.proof-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; gap: 1rem; border-bottom: 1px solid var(--line); padding-top: 1.35rem; padding-bottom: 1.35rem; }
 .proof-stat { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: .55rem; }
 .proof-stat strong { color: var(--signal); font: 500 1.55rem/1 "DM Mono", monospace; }
 .proof-stat span { color: #d0d2cb; font-size: .88rem; line-height: 1.25; }
@@ -129,6 +129,7 @@ a { color: inherit; text-decoration: none; }
 .not-found .text-link span { color: var(--signal); }
 
 @media (max-width: 1000px) {
+  .proof-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .finding-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .method-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
