@@ -1,24 +1,124 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
+import { acceptedFixCount, disclosures, mergedFixCount, publishedAdvisoryCount } from "../data/disclosures";
 
 const base = import.meta.env.BASE_URL;
+const categories = [...new Set(disclosures.map((item) => item.category))].sort();
+const totalWork = disclosures.length;
 ---
 
-<SiteLayout image={`${base}images/milky-way.webp`} preloadImage={`${base}images/milky-way.webp`}>
+<SiteLayout title="Security findings" description="Published security advisories and upstream fixes by Anubhav Dash across blockchain clients, virtual machines, peer networking, and multimedia code." image={`${base}images/milky-way.webp`} preloadImage={`${base}images/milky-way.webp`}>
   <main id="main">
-    <section class="home-hero mx-auto max-w-7xl px-6 pt-4 lg:px-10">
+    <section class="portfolio-hero mx-auto max-w-7xl px-6 pt-4 lg:px-10">
       <div class="hero-frame">
         <img class="hero-image" src={`${base}images/milky-way.webp`} alt="The Milky Way above a quiet mountain ridge" width="800" height="551" fetchpriority="high" decoding="async" />
         <div class="hero-shade"></div>
         <div class="hero-copy">
-          <h1>Under this wide sky,<br /><span>there's always more</span></h1>
-          <p class="hero-description">Independent security research on blockchain nodes, virtual machines, and the bugs that make them misbehave.</p>
+          <p class="eyebrow">INDEPENDENT SECURITY RESEARCH / PUBLIC RECORD</p>
+          <h1>Find the assumption.<br /><span>Follow it to the fix.</span></h1>
+          <p class="hero-description">Security findings across L1 clients, VM hosts, peer networking, and multimedia code. Each entry points to the advisory or upstream change that backs it.</p>
           <a class="hero-audit-cta" href="https://x.com/An0n99X" target="_blank" rel="noreferrer" aria-label="Contact Anubhav Dash on X about security research or a review">
-            <span class="hero-audit-copy"><strong>Let’s find what your tests missed.</strong><span>Go nodes · VMs · Consensus · DM me on X</span></span>
+            <span class="hero-audit-copy"><strong>Have a hard system to test?</strong><span>Go nodes · VMs · Consensus · DM me on X</span></span>
             <span class="hero-audit-arrow" aria-hidden="true">↗</span>
           </a>
         </div>
+        <div class="hero-coordinate" aria-hidden="true"><span>RESEARCH LOG</span><span>IN / PUBLIC</span></div>
+      </div>
+    </section>
+
+    <section class="proof-strip mx-auto max-w-7xl px-6 lg:px-10" aria-label="Disclosure totals">
+      <div class="proof-stat"><strong>{publishedAdvisoryCount}</strong><span>published GHSAs</span></div>
+      <div class="proof-stat"><strong>{mergedFixCount}</strong><span>merged FFmpeg fixes</span></div>
+      <div class="proof-stat"><strong>{acceptedFixCount}</strong><span>additional Klever fixes</span></div>
+      <p class="proof-note">Public work only. Private disclosures stay private until the upstream record is ready.</p>
+    </section>
+
+    <section id="findings" class="findings-section mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24" aria-labelledby="findings-title">
+      <div class="section-intro">
+        <div>
+          <p class="eyebrow">THE FINDING INDEX</p>
+          <h2 id="findings-title">A map of broken assumptions.</h2>
+          <p>Search by component, mechanism, or impact. Open a case for its source record and upstream trail.</p>
+        </div>
+        <span class="index-total"><strong>{totalWork}</strong><span>public records</span></span>
+      </div>
+
+      <div class="filter-panel" role="search" aria-label="Filter security findings">
+        <label class="search-field"><span class="sr-only">Search findings</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><input id="finding-search" type="search" placeholder="Search component, bug class, or impact" autocomplete="off" /></label>
+        <label><span class="sr-only">Project</span><select id="project-filter" aria-label="Filter by project"><option value="">All projects</option><option>Klever Go</option><option>FFmpeg</option></select></label>
+        <label><span class="sr-only">Category</span><select id="category-filter" aria-label="Filter by finding category"><option value="">All attack surfaces</option>{categories.map((category) => <option>{category}</option>)}</select></label>
+        <label><span class="sr-only">Severity</span><select id="severity-filter" aria-label="Filter by severity"><option value="">All levels</option><option>High</option><option>Moderate</option><option>Low</option><option>Accepted</option></select></label>
+      </div>
+      <div class="result-line"><p id="result-count" aria-live="polite">Showing {totalWork} public records</p><a href="#method">How I investigate <span aria-hidden="true">↓</span></a></div>
+
+      <div id="finding-grid" class="finding-grid">
+        {disclosures.map((item) => <article class="finding-card" data-project={item.project} data-category={item.category} data-severity={item.severity} data-search={`${item.id} ${item.project} ${item.category} ${item.title} ${item.summary} ${item.impact} ${item.credit ?? ""} ${item.kind}`.toLowerCase()}>
+          <div class="finding-card-top"><span class="record-kind">{item.kind}</span><span class={`severity-badge ${item.severity.toLowerCase()}`}>{item.severity === "Accepted" ? "ACCEPTED" : item.severity.toUpperCase()}</span></div>
+          <p class="finding-category">{item.project}<span aria-hidden="true"> / </span>{item.category}</p>
+          <h3>{item.title}</h3>
+          <p class="finding-summary">{item.summary}</p>
+          <p class="finding-impact"><span>IMPACT</span>{item.impact}</p>
+          <details class="evidence-details">
+            <summary>Evidence trail <span aria-hidden="true">＋</span></summary>
+            <div class="evidence-body">
+              <p class="evidence-meta">{item.id} <span>·</span> {item.date}{item.credit && <> <span>·</span> Credited as {item.credit}</>}</p>
+              <div class="evidence-links">
+                <a href={item.url} target="_blank" rel="noreferrer">{item.kind === "GHSA" ? "Open published advisory" : item.kind === "Merged fix" ? "Open merged upstream PR" : "Open upstream release"}<span aria-hidden="true"> ↗</span></a>
+                {item.release && item.kind !== "Accepted fix" && <a href={item.release} target="_blank" rel="noreferrer">Klever Go v1.7.22 release<span aria-hidden="true"> ↗</span></a>}
+              </div>
+            </div>
+          </details>
+        </article>)}
+      </div>
+      <p id="no-results" class="no-results" hidden>No records match those filters. Try a broader search.</p>
+    </section>
+
+    <section id="method" class="method-section" aria-labelledby="method-title">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
+        <div class="method-heading">
+          <div><p class="eyebrow">HOW THE WORK GETS DONE</p><h2 id="method-title">A finding has to survive the proof.</h2></div>
+          <a href="https://github.com/AnubhavDash/Hades" target="_blank" rel="noreferrer">Explore Hades, my audit kit <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="method-steps" aria-label="Research process">
+          <div><span>01 / MAP</span><strong>Choose an attack surface</strong><p>Use code structure, churn, and coverage gaps to decide where to look.</p></div>
+          <div><span>02 / EXPLORE</span><strong>Test the assumptions</strong><p>Trace reachable paths and build a reproducer for each candidate.</p></div>
+          <div><span>03 / GATE</span><strong>Check novelty and impact</strong><p>Compare against prior findings and verify the claim matches the evidence.</p></div>
+          <div><span>04 / REVIEW</span><strong>Try to break the proof</strong><p>Run the reproducer cold, then report only what survives review.</p></div>
+        </div>
+        <p class="embargo-note"><span aria-hidden="true">✳</span> Findings under coordinated disclosure are withheld until the upstream record is ready.</p>
       </div>
     </section>
   </main>
 </SiteLayout>
+
+<script>
+  const search = document.querySelector<HTMLInputElement>("#finding-search");
+  const project = document.querySelector<HTMLSelectElement>("#project-filter");
+  const category = document.querySelector<HTMLSelectElement>("#category-filter");
+  const severity = document.querySelector<HTMLSelectElement>("#severity-filter");
+  const cards = [...document.querySelectorAll<HTMLElement>(".finding-card")];
+  const resultCount = document.querySelector<HTMLElement>("#result-count");
+  const noResults = document.querySelector<HTMLElement>("#no-results");
+
+  function applyFilters() {
+    const query = search?.value.trim().toLowerCase() ?? "";
+    let visibleCount = 0;
+
+    for (const card of cards) {
+      const matches = (!query || card.dataset.search?.includes(query))
+        && (!project?.value || card.dataset.project === project.value)
+        && (!category?.value || card.dataset.category === category.value)
+        && (!severity?.value || card.dataset.severity === severity.value);
+      card.hidden = !matches;
+      if (matches) visibleCount += 1;
+    }
+
+    if (resultCount) resultCount.textContent = `Showing ${visibleCount} of ${cards.length} public records`;
+    if (noResults) noResults.hidden = visibleCount > 0;
+  }
+
+  search?.addEventListener("input", applyFilters);
+  project?.addEventListener("change", applyFilters);
+  category?.addEventListener("change", applyFilters);
+  severity?.addEventListener("change", applyFilters);
+</script>
