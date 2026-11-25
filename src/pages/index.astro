@@ -1,6 +1,6 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { acceptedFixCount, disclosures, mergedFixCount, publishedAdvisoryCount } from "../data/disclosures";
+import { acceptedFixCount, disclosures, publishedAdvisoryCount } from "../data/disclosures";
 
 const base = import.meta.env.BASE_URL;
 const categories = [...new Set(disclosures.map((item) => item.category))].sort();
@@ -28,8 +28,8 @@ const totalWork = disclosures.length;
 
     <section class="proof-strip mx-auto max-w-7xl px-6 lg:px-10" aria-label="Disclosure totals">
       <div class="proof-stat"><strong>{publishedAdvisoryCount}</strong><span>published GHSAs</span></div>
-      <div class="proof-stat"><strong>{mergedFixCount}</strong><span>merged FFmpeg fixes</span></div>
       <div class="proof-stat"><strong>{acceptedFixCount}</strong><span>additional Klever fixes</span></div>
+      <div class="proof-stat"><strong>{totalWork}</strong><span>public records</span></div>
     </section>
 
     <section id="findings" class="findings-section mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24" aria-labelledby="findings-title">
@@ -44,7 +44,7 @@ const totalWork = disclosures.length;
 
       <div class="filter-panel" role="search" aria-label="Filter security findings">
         <label class="search-field"><span class="sr-only">Search findings</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><input id="finding-search" type="search" placeholder="Search component, bug class, or impact" autocomplete="off" /></label>
-        <label><span class="sr-only">Project</span><select id="project-filter" aria-label="Filter by project"><option value="">All projects</option><option>Klever Go</option><option>FFmpeg</option></select></label>
+        <label><span class="sr-only">Project</span><select id="project-filter" aria-label="Filter by project"><option value="">All projects</option><option>Klever Go</option></select></label>
         <label><span class="sr-only">Category</span><select id="category-filter" aria-label="Filter by finding category"><option value="">All attack surfaces</option>{categories.map((category) => <option>{category}</option>)}</select></label>
         <label><span class="sr-only">Severity</span><select id="severity-filter" aria-label="Filter by severity"><option value="">All levels</option><option>High</option><option>Moderate</option><option>Low</option><option>Accepted</option></select></label>
       </div>
@@ -62,8 +62,7 @@ const totalWork = disclosures.length;
             <div class="evidence-body">
               <p class="evidence-meta">{item.id} <span>·</span> {item.date}{item.credit && <> <span>·</span> Credited as {item.credit}</>}</p>
               <div class="evidence-links">
-                <a href={item.url} target="_blank" rel="noreferrer">{item.kind === "GHSA" ? "Open published advisory" : item.kind === "Merged fix" ? "Open merged upstream PR" : "Open upstream release"}<span aria-hidden="true"> ↗</span></a>
-                {item.release && item.kind !== "Accepted fix" && <a href={item.release} target="_blank" rel="noreferrer">Klever Go v1.7.22 release<span aria-hidden="true"> ↗</span></a>}
+                <a href={item.url} target="_blank" rel="noreferrer">{item.kind === "GHSA" ? "Open published advisory" : "Open upstream release"}<span aria-hidden="true"> ↗</span></a>
               </div>
             </div>
           </details>

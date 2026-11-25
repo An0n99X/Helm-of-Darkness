@@ -4,7 +4,7 @@ Helm of Darkness is Anubhav Dash's security research portfolio. It presents publ
 
 **Website:** <https://anubhavdash.github.io/Helm-of-Darkness/>
 
-The site is a static Astro project styled with Tailwind CSS. Its public index covers 19 Klever Go GHSAs, three merged FFmpeg fixes, and four additional accepted Klever Go fixes without separate advisories.
+The site is a static Astro project styled with Tailwind CSS. Its public index covers 19 Klever Go GHSAs and four additional accepted Klever Go fixes without separate advisories.
 
 ## Run locally
 

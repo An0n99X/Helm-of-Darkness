@@ -1,9 +1,9 @@
-export type DisclosureKind = "GHSA" | "Merged fix" | "Accepted fix";
+export type DisclosureKind = "GHSA" | "Accepted fix";
 export type Severity = "High" | "Moderate" | "Low" | "Accepted";
 
 export interface Disclosure {
   id: string;
-  project: "Klever Go" | "FFmpeg";
+  project: "Klever Go";
   kind: DisclosureKind;
   severity: Severity;
   category: string;
@@ -13,7 +13,6 @@ export interface Disclosure {
   credit?: "Finder" | "Reporter";
   date: string;
   url: string;
-  release?: string;
 }
 
 const kleverAdvisory = (
@@ -37,7 +36,6 @@ const kleverAdvisory = (
   credit,
   date,
   url: `https://github.com/klever-io/klever-go/security/advisories/${id}`,
-  release: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
 });
 
 export const disclosures: Disclosure[] = [
@@ -61,42 +59,6 @@ export const disclosures: Disclosure[] = [
   kleverAdvisory("GHSA-hw69-3fg8-wrmm", "Nested output merges grow deleted-account data", "P2P & node liveness", "High", "Reporter", "Successful sibling calls repeatedly duplicated inherited DeletedAccounts entries during output merging.", "Nested VM execution can amplify memory and delay validators."),
   kleverAdvisory("GHSA-g797-9c85-644m", "Missing block header crashes allowance lookup", "P2P & node liveness", "Moderate", "Reporter", "GetAvailableClaim dereferenced a nil current block header in a helper goroutine.", "An API allowance query can terminate the node process.", "2026-09"),
   {
-    id: "FFmpeg PR #21457",
-    project: "FFmpeg",
-    kind: "Merged fix",
-    severity: "High",
-    category: "Native memory safety",
-    title: "Heap over-read through vf_find_rect compare()",
-    summary: "A heap overflow in vf_find_rect.c let compare() read beyond the intended buffer.",
-    impact: "Malformed media can trigger an out-of-bounds read in the filter path.",
-    date: "2026-02",
-    url: "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21457",
-  },
-  {
-    id: "FFmpeg PR #21409",
-    project: "FFmpeg",
-    kind: "Merged fix",
-    severity: "High",
-    category: "Native memory safety",
-    title: "Off-by-one heap over-read through downscale()",
-    summary: "An off-by-one error in vf_find_rect.c let downscale() read past a heap buffer.",
-    impact: "A crafted media input can reach an out-of-bounds read in native code.",
-    date: "2026-02",
-    url: "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21409",
-  },
-  {
-    id: "FFmpeg PR #21402",
-    project: "FFmpeg",
-    kind: "Merged fix",
-    severity: "Low",
-    category: "Integer bounds",
-    title: "Integer overflow can reach division by zero",
-    summary: "Overflow in scale_eval.c dimension adjustment could produce a zero divisor in eval_expr().",
-    impact: "A malformed scale expression can reach a division-by-zero failure.",
-    date: "2026-02",
-    url: "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21402",
-  },
-  {
     id: "Klever Go · v1.7.22",
     project: "Klever Go",
     kind: "Accepted fix",
@@ -107,7 +69,6 @@ export const disclosures: Disclosure[] = [
     impact: "The epoch-boundary cleanup is recorded as an upstream contribution.",
     date: "2026-10",
     url: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
-    release: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
   },
   {
     id: "Klever Go · v1.7.22",
@@ -120,7 +81,6 @@ export const disclosures: Disclosure[] = [
     impact: "Expired rewards follow the intended protocol accounting path.",
     date: "2026-10",
     url: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
-    release: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
   },
   {
     id: "Klever Go · v1.7.22",
@@ -133,7 +93,6 @@ export const disclosures: Disclosure[] = [
     impact: "Metering now accounts for the operation in the intended order.",
     date: "2026-10",
     url: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
-    release: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
   },
   {
     id: "Klever Go · v1.7.22",
@@ -146,10 +105,8 @@ export const disclosures: Disclosure[] = [
     impact: "Metering tracks repeated vector work instead of charging only once for the whole operation.",
     date: "2026-10",
     url: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
-    release: "https://github.com/klever-io/klever-go/releases/tag/v1.7.22",
   },
 ];
 
 export const publishedAdvisoryCount = disclosures.filter((item) => item.kind === "GHSA").length;
-export const mergedFixCount = disclosures.filter((item) => item.kind === "Merged fix").length;
 export const acceptedFixCount = disclosures.filter((item) => item.kind === "Accepted fix").length;
