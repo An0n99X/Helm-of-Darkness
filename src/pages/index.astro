@@ -52,7 +52,7 @@ const totalWork = disclosures.length;
       <div class="result-line"><p id="result-count" aria-live="polite">Showing {totalWork} public records</p><a href="#method">How I investigate <span aria-hidden="true">↓</span></a></div>
 
       <div id="finding-grid" class="finding-grid">
-        {disclosures.map((item) => <article class="finding-card" data-project={item.project} data-category={item.category} data-severity={item.severity} data-search={`${item.id} ${item.project} ${item.category} ${item.title} ${item.summary} ${item.impact} ${item.credit ?? ""} ${item.kind} ${item.cvss ?? ""} ${item.programStatus ?? ""}`.toLowerCase()}>
+        {disclosures.map((item) => <article class="finding-card" data-project={item.project} data-category={item.category} data-severity={item.severity} data-search={`${item.id} ${item.project} ${item.category} ${item.title} ${item.summary} ${item.impact} ${item.kind} ${item.cvss ?? ""} ${item.programStatus ?? ""}`.toLowerCase()}>
           <div class="finding-card-top"><span class="record-kind">{item.kind}</span><span class={`severity-badge ${item.severity.toLowerCase()}`}>{item.severity === "Accepted" ? "ACCEPTED" : item.severity.toUpperCase()}</span></div>
           <p class="finding-category">{item.project}<span aria-hidden="true"> / </span>{item.category}</p>
           <h3>{item.title}</h3>
@@ -61,7 +61,7 @@ const totalWork = disclosures.length;
           <details class="evidence-details">
             <summary>Evidence trail <span aria-hidden="true">＋</span></summary>
             <div class="evidence-body">
-              <p class="evidence-meta">{item.id} <span>·</span> {item.date}{item.cvss && <> <span>·</span> CVSS {item.cvss}</>}{item.credit && <> <span>·</span> Credited as {item.credit}</>}{item.programStatus && <> <span>·</span> {item.programStatus}</>}{item.sourceProgram && <> <span>·</span> {item.sourceProgram}</>}</p>
+              <p class="evidence-meta">{item.id} <span>·</span> {item.date}{item.cvss && <> <span>·</span> CVSS {item.cvss}</>}{item.programStatus && <> <span>·</span> {item.programStatus}</>}{item.sourceProgram && <> <span>·</span> {item.sourceProgram}</>}</p>
               <div class="evidence-links">
                 {item.url && <a href={item.url} target="_blank" rel="noreferrer">{item.kind === "GHSA" ? "Open published advisory" : "Open upstream release"}<span aria-hidden="true"> ↗</span></a>}
               </div>
