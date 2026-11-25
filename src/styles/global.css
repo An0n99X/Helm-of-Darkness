@@ -60,11 +60,10 @@ a { color: inherit; text-decoration: none; }
 .hero-audit-arrow { flex: 0 0 auto; font: 600 1.35rem/1 "DM Mono", monospace; }
 .hero-coordinate { position: absolute; right: 1.5rem; bottom: 1.25rem; z-index: 1; display: flex; gap: 1.2rem; color: rgba(233, 231, 223, .75); font: .65rem "DM Mono", monospace; letter-spacing: .1em; }
 
-.proof-strip { display: grid; grid-template-columns: repeat(3, minmax(120px, auto)) minmax(220px, 1fr); align-items: center; gap: 1rem; border-bottom: 1px solid var(--line); padding-top: 1.35rem; padding-bottom: 1.35rem; }
+.proof-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 1rem; border-bottom: 1px solid var(--line); padding-top: 1.35rem; padding-bottom: 1.35rem; }
 .proof-stat { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: .55rem; }
 .proof-stat strong { color: var(--signal); font: 500 1.55rem/1 "DM Mono", monospace; }
 .proof-stat span { color: #d0d2cb; font-size: .88rem; line-height: 1.25; }
-.proof-note { justify-self: end; max-width: 330px; margin: 0; color: #aeb1a8; font-size: .82rem; line-height: 1.45; text-align: right; }
 
 .findings-section { scroll-margin-top: 1rem; }
 .section-intro { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
@@ -119,24 +118,17 @@ a { color: inherit; text-decoration: none; }
 .method-section { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #0d1011; }
 .method-heading { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
 .method-heading h2 { margin-bottom: 0; }
-.method-heading > a { flex: 0 0 auto; padding-bottom: .5rem; color: #d9f2ac; font-size: .92rem; text-decoration: underline; text-decoration-color: rgba(196, 241, 91, .4); text-underline-offset: 4px; }
-.method-heading > a span { color: var(--signal); }
 .method-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .method-steps > div { min-width: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1.15rem 1.2rem 1.25rem; }
 .method-steps > div > span { color: var(--signal); font: .66rem "DM Mono", monospace; letter-spacing: .06em; }
 .method-steps strong { display: block; margin: .75rem 0 .35rem; color: #efeee7; font: 600 1.16rem/1.16 "Newsreader", Georgia, serif; }
 .method-steps p { margin: 0; color: #b7bab1; font-size: .86rem; line-height: 1.55; }
-.embargo-note { display: flex; align-items: start; gap: .55rem; margin: 1.3rem 0 0; color: #aeb1a8; font-size: .82rem; }
-.embargo-note span { color: var(--signal); }
-
 .not-found { min-height: 75vh; }
 .not-found h1 { font-size: clamp(3rem, 7vw, 6.5rem); }
 .not-found .text-link { display: inline-flex; align-items: center; gap: .55rem; margin-top: 1.2rem; color: var(--paper); font-size: .98rem; font-weight: 600; }
 .not-found .text-link span { color: var(--signal); }
 
 @media (max-width: 1000px) {
-  .proof-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .proof-note { grid-column: 1 / -1; justify-self: start; max-width: none; text-align: left; }
   .finding-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .method-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -148,7 +140,6 @@ a { color: inherit; text-decoration: none; }
   .search-field { grid-column: 1 / -1; }
   .section-intro, .method-heading { align-items: start; }
   .method-heading { flex-direction: column; gap: .9rem; }
-  .method-heading > a { padding-bottom: 0; }
 }
 
 @media (max-width: 640px) {
@@ -173,7 +164,6 @@ a { color: inherit; text-decoration: none; }
   .proof-stat { align-items: start; grid-template-columns: auto 1fr; gap: .5rem; }
   .proof-stat strong { font-size: 1.35rem; }
   .proof-stat span { max-width: 110px; font-size: .78rem; }
-  .proof-note { grid-column: 1 / -1; margin-top: .3rem; font-size: .76rem; }
   .findings-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
   .section-intro { gap: .6rem; margin-bottom: 1.35rem; }
   .section-intro h2, .method-heading h2 { font-size: 2rem; }
