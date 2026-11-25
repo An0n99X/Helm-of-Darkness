@@ -10,7 +10,7 @@ interface Props {
 
 const {
   title = "Helm of Darkness",
-  description = "Independent security research by Anubhav Dash on blockchain nodes and VM hosts, with vulnerability analysis, reproduction evidence, disclosure, and fixes.",
+  description = "Independent security research and security reviews by Anubhav Dash.",
   image,
   preloadImage,
 } = Astro.props;
@@ -49,7 +49,6 @@ const base = import.meta.env.BASE_URL;
           <span>HELM <span class="brand-muted">OF DARKNESS</span></span>
         </a>
         <nav class="flex items-center gap-7" aria-label="Main navigation">
-          <a class="nav-link" href={`${base}#research`}>Research</a>
           <a class="nav-link nav-github" href="https://github.com/AnubhavDash" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
         </nav>
       </div>

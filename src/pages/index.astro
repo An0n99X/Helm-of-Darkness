@@ -1,13 +1,7 @@
 ---
-import { getCollection } from "astro:content";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
-const posts = await getCollection("posts", ({ data }) => data.published <= new Date());
-const sortedPosts = posts.sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
-const featured = sortedPosts.find((post) => post.data.featured) ?? sortedPosts[0];
-const recent = sortedPosts.filter((post) => post.id !== featured?.id).slice(0, 3);
 const base = import.meta.env.BASE_URL;
-const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base}research/`;
 ---
 
 <SiteLayout image={`${base}images/milky-way.webp`} preloadImage={`${base}images/milky-way.webp`}>
@@ -23,45 +17,8 @@ const featureUrl = featured ? `${base}research/${featured.data.slug}/` : `${base
             <span class="hero-audit-copy"><strong>Let’s find what your tests missed.</strong><span>Go nodes · VMs · Consensus · DM me on X</span></span>
             <span class="hero-audit-arrow" aria-hidden="true">↗</span>
           </a>
-          <a class="text-link hero-link" href={featureUrl}>Read the latest research <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
-
-    <section id="research" class="content-section mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-28" aria-labelledby="featured-heading">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Research</p>
-          <h2 id="featured-heading">Latest report</h2>
-        </div>
-        <a class="text-link archive-link" href={`${base}research/`}>All research <span aria-hidden="true">→</span></a>
-      </div>
-
-      {featured ? (
-        <a class="feature-card group" href={featureUrl}>
-          <div class="feature-index"><span>FEATURED</span><span class="feature-cross" aria-hidden="true">↗</span></div>
-          <div class="feature-main">
-            <div class="flex flex-wrap gap-2">
-              {featured.data.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
-            </div>
-            <h3>{featured.data.title}</h3>
-            <p class="feature-description">{featured.data.description}</p>
-            <div class="feature-meta"><time datetime={featured.data.published.toISOString()}>{featured.data.published.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time></div>
-          </div>
-          <div class="feature-aside">
-            <img class="constellation-image" src={`${base}images/cassiopeia-constellation.webp`} alt="The Cassiopeia constellation outlined against a star field" width="1000" height="667" loading="lazy" decoding="async" />
-          </div>
-        </a>
-      ) : (
-        <p class="empty-state">No reports published yet.</p>
-      )}
-    </section>
-
-    {recent.length > 0 && <section class="recent-section"><div class="mx-auto max-w-7xl px-6 py-16 lg:px-10">
-      <div class="section-heading"><div><p class="eyebrow">Latest notes</p><h2>From the archive</h2></div><a class="text-link archive-link" href={`${base}research/`}>Browse archive <span aria-hidden="true">→</span></a></div>
-      <div class="recent-grid">
-        {recent.map((post) => <a class="recent-card" href={`${base}research/${post.data.slug}/`}><p class="eyebrow">{post.data.tags[0] ?? "Research"}</p><h3>{post.data.title}</h3><p>{post.data.description}</p><time datetime={post.data.published.toISOString()}>{post.data.published.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}</time></a>)}
-      </div>
-    </div></section>}
   </main>
 </SiteLayout>
